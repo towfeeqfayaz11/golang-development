@@ -30,6 +30,15 @@ v := <-ch  // Receive from ch, and
 
 => close(ch)   -> closing of the channel is very useful for the sender gouroutine to indicate to the receiver gouroutine that 
                   the sender has no more values to send on the channel and the receiver can unblock and proceed with its other computation
+NOTE: closing on nil channels will panic
+
+
+********** best practice for channel to avoid deadlocks ********
+=> the best practice is that the goroutine that creates the channel, will be the goroutine that write to the channel and will also
+   be responsible for closing the channel
+=> owner of the channel is the goroutine that instantiates , writes and closes the channel
+=> channel utilizers, are goroutines that only have a read-only view into the channel
+****************************************************************
 
 => receive returns two values;
    value, ok := <- ch
@@ -68,3 +77,20 @@ v := <-ch  // Receive from ch, and
    => the receiver can keep receiving the values wihotu blocking till buffer gets empty. when buffer gets empty, the receiver 
       will block
 
+=========================================================================================
+==> channel types <==
+=> we can have send only, receive only or bidirectional channels
+
+=> biridrectional channel
+   func helper(ch chan string){               --> bidirectional channel
+
+   }
+
+=> 
+   func helper(ch <-chan string){             --> receive only channel
+       // ch can be used only to receive value
+   }
+=> 
+   func helper(ch chan<- string){             --> send only channel
+       // ch can be used only to send values
+   }

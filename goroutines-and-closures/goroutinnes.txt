@@ -1,0 +1,19 @@
+=> goroutines are userspace threads managed by go runntime
+=> go runtime is part of executable, it is built into the executable of the application
+
+=> goroutines are even lighter than os threads
+=> the context shwitching of goroutines is cheaper than os threads
+
+
+
+==> os threads vs go routines <==
+=> go runtime creates worker os threads.
+   goroutines runs in the context of os threads.
+   many goroutines can execute in the context of single os thread
+
+   The OS schedules the os threads and go runtime schedules the multiple go routines on the os thread.
+   For OS nothing has changed, it is still managing/scheduling the threads as it was. Go runntime manages the scheduling the goroutines on the os thread
+   
+
+=> goroutine stack size is very small of 2kb compares to 8mb of stack of os thread. the stack size for goroutine can shrink 
+   and expand as per requirement

@@ -1,0 +1,106 @@
+=> physical cpu is also called a socket or processor in computer
+
+=> (socket) or (physical cpu) or (processor)    -->  number of physical cpu slots in a computer
+=> (cores per socket)                           -->  each physical cpu has one or more cores
+=> threads or VCPU's or logical cpu's           -->  each core has one or more thread 
+
+   total VCPU's  = sockets * cores * threads
+
+
+
+
+=> multi-processing    --> more than 1 core, each core has 1 thread
+
+=> multi-programming   --> only 1 core, and the core has 1 thread
+                       --> use context switching
+                       --> the context switching happens only when one program leaves cpu for some other task like i/o operation
+
+=> multi-tasking       --> uses context switching but with time sharing (promising a dedicated time slot for each process)
+                       --> here a small timestamp is assigned to each process unlike multiprogramming where next process uses cpu
+                           only if previosu process released it due to some i/o work
+                       --> here still each core has 1 thread
+
+=> multi-threading     --> here we have more than 1 core and each core has more than one thread
+
+
+=================================================================================================
+==> CPU thread vs OS thread <==
+                or
+==> hardware thread vs software thread <==
+
+=> They are different TYPES of things, but associated by the way they are visualized or imagined.
+   
+   A CPU “thread”  or hardware thread is part of the hardware capability of the CPU to perform more than one task (almost) at the same time even when on the same core. That is, each thread represents the actual execution of a series of instructions (a thread of instructions).
+
+   An OS thread or software thread is a logical resource group that has stack space and registry contents that will execute a set of instructions (a thread) when given a chance by the OS and CPU. (i.e., when it’s “Scheduled” on the CPU)
+
+   One hardware thread can run many software threads.In modern operating systems, this is often done by time-slicing - each thread gets a few milliseconds to execute before the OS schedules another thread to run on that hardware thread.
+
+   Software threads are threads of execution managed by the operating system.
+
+   Hardware threads are a feature of some processors that allow better utilisation of the processor under some circumstances. They may be exposed to/by the operating system as appearing to be additional cores ("hyperthreading").
+
+
+
+=> Even in a single CPU/single-core/single-thread CHIP there might be hundreds or thousands of OS threads “running”.
+
+   The CPU thread count is the maximum number of OS threads that can LITERALLY be using the processor at a single moment.
+
+   Right now (or a few moments ago) my laptop with 1 CPU/4 Cores and 8 threads had 7,290 OS threads “running” (from 553 processes.)
+   Only 8 could really be “running” at once, so the others were either queued, or waiting on some resource.
+=================================================================================================
+
+
+=> the below is a discussion about OS threads / Software threads
+==> process vs thread <==
+
+=> process -> an instance of a running program
+           -> a running program can have more than one instance running together, hence more than one process for same program
+           -> a process provides an environment for a program to execute
+
+=> when a program is executed, the OS creates a process and allocates memory in the virtual address space. The virtual address space
+   will contain; code segment, data segment, heap, stack
+
+   stack       --> used for storing local functions and local variables
+   heap        --> used for dynamic memory allocation
+   data        --> contains gloabl variables
+   code        --> compiled machine code (machine instructions)
+
+
+=> threads  -> are the smallest unit of execution that a cpu accepts
+            -> each process has atleast one thread that is called main thread
+            -> a process can have multiple threads
+            -> a thread share the same address space
+            -> each thread has its own stack
+
+
+
+       single thread                                           multi thread
+
+
+      >Heap                                                     >Heap
+      >Data                                                     >Data
+      >code                                                     >code
+     <thread1/main-thread>                                <thread1>            <thread2>     
+      >stack                                             >stack               >stack
+      >registers                                         >registers           >registers
+      >program counters                                  >program-counters    >program-counters
+
+
+=> threads can run independent of each other
+=> os scheduler makes scheduling decisions at thread level and not at prcess level
+=> threads can run concurrently(with each thread taking turn on an individual core) or in parallel(which each thread running at 
+   the same time on different cores)
+
+
+NOTE: the context switching between the threads of same process are relatively cheap compared to context switching between threads
+      of diffeent processes
+
+
+
+      process context:                                        thread context:
+      > process state                                         > program counter
+      > cpu scheduling info                                   > cpu registers
+      > memory management info                                > stack
+      > accounting info
+      > i/o status info

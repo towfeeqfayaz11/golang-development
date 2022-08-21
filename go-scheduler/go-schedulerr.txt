@@ -1,0 +1,53 @@
+=> go scheduler is part of go runtime. go runtime is part of executable
+=> go scheduler is also called M:N scheduler
+=> go scheduler runs in the user space
+=> go routines are scheduled on os threads by go scheduler
+=> go routine runs in the context of os threads
+
+
+=========
+=> go runtime creates a number of worker os threads, equal to GOMAXPROCS
+=> GOMAXPROCS -> the default value is the number of cores on the machine (considering core to be single threaded in this case).
+                 If multi-threaded, then GOMAXPROCS can have a max value equal to number of hardware threads.
+=> it is the responsibility of go scheduler to distribute runnable goroutines over multiple worker os threads
+
+=> at any time , N goroutines could be scheduled on M os threads that runs at most on GOMAXPROCS number of processors
+
+
+
+Core (consider single threaded)
+ |
+ |
+ |
+ |
+ M (for a cpu core hardware thread, goruntime creates an OS thread represented by letter M)
+ |
+ |-- G1          G represents a goroutine running on an os thread
+ |
+ |
+ P               (go runtime also created a logical processor P, and associated that with the OS thread M, the logical processor
+ |-- G2           holds the context for scheduling, which can be seens as a local scheduler running on a thread)
+     G3
+     G4          each logical processor P has a local run queue, where runnable goroutines are queued
+ local run queue 
+
+                                               G5
+                                               G6
+                                               G7
+                                      global run queue
+
+=> there is a gloabl run queue. Once the local run queue is exhausted, the logical processor will pull the go routines from local
+   run queue of other logical processors, one that is also finished then it will pull from gloabl run queue. when new go routines are created they are added to the end of gloabl run queue.
+
+
+=> there is a one to one mapping between os threads and logical processors
+
+
+
+=> for synchronous system calls(e.; file read),
+   when go scheduler realises that a go routine is waiting for i/o operation, it detachs the rest local queue from logical processor and uses a new os thread from pool to schedule the queued goroutines
+
+
+=> for the asynchronous system calls(e.g; network sys call or http api call),
+   go scheduler used netpoller to convert non blocking(async) to blocking(sync) call.
+   when a goroutine makes an async call and file decsriptor is not ready, that goroutine is parked at netpoller os thread
